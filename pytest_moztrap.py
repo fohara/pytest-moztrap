@@ -15,16 +15,17 @@ def pytest_addoption(parser):
                      dest='moztrap_username',
                      metavar='str',
                      help='moztrap username')
-    group._addoption('--mt-password',
+    group._addoption('--mt-apikey',
                      action='store',
-                     dest='moztrap_password',
+                     dest='moztrap_apikey',
                      metavar='str',
-                     help='moztrap password')
+                     help='Ask your MozTrap admin to generate an API key in the Core / ApiKeys table and provide it to you.')
     group._addoption('--mt-product',
                      action='store',
                      dest='moztrap_product',
                      metavar='str',
                      help='product identifier')
+    # i don't think cycle exists as a moztrap concept
     group._addoption('--mt-cycle',
                      action='store',
                      dest='moztrap_cycle',
@@ -46,6 +47,19 @@ def pytest_addoption(parser):
                      metavar='str',
                      help='show the coverage report')
 
+# TODO
+#  * import / install mtconnect https://github.com/camd/moztrap-connect
+#    http://moztrap-connect.readthedocs.org/en/latest/api.html
+#    (git subtree or ask camd to publish to pip?)
+#  * connect to moztrap mtconnect.connect.Connect(protocol, host, username, api_key, DEBUG=False)
+#  * determine the moztrap env_id relationship to the selenium driver
+#  * create a mtconnect.connect.TestResults object
+#  * find out if the run specified by --mt-run exists connect.get_runs(**kwargs)
+#    * create it if it doesn't exist connect.submit_run(name, description, productversion_id, testresults)
+#    * just submit TestResults if it exists connect.submit_results(run_id, testresults)
+#  * fetch and display coverage report for run (this doesn't exist in the API yet)
+#  @davehunt, please review this before i send the PR to camd
+#    * https://github.com/klrmn/moztrap-connect/commit/84d3190995613092167a312467e22f89b5589024
 
 def pytest_configure(config):
     config.addinivalue_line(
@@ -73,8 +87,18 @@ def pytest_runtest_makereport(__multicall__, item, call):
             if not isinstance(_ids, list):
                 _ids = [_ids]
             for x in _ids:
+
                 if report.skipped:
+                    # TODO: TestResults.addinvalid(case_id, environment_id, comment) ???
                     continue
-                if not test_cases.has_key(x) or report.failed:
+                if report.failed:
+                    # TODO: TestResults.addfail(case_id, environment_id, comment, stepnumber=0, bug=None)
+                    # make sure comment has info from parameterize
                     test_cases[x] = report.outcome.upper()
+                if report.passed:
+                    if not test_cases.has_key(x):
+                        # TODO: TestResults.addpass(case_id, environment_id)
+                        test_cases[x] = report.outcome.upper()
+                # TODO: report xfails and/or xpasses?
+
     return report
