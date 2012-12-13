@@ -16,6 +16,91 @@ In the event that two tests have the same test case id or the test is parameteri
 
 The MozTrap report will be printed if 'T' is included in the -r option. The MozTrap report includes a line for each MozTrap test case with test case id (the id used in the @pytest.mark.moztrap marker), test case run id (for debugging purposes), the MozTrap status of the test, and the test's name in MozTrap. If the --verbose option is used, the contents of the comment field will be printed along with the MozTrap report. One comment line appears for each aggregated result. Parameters used by parametrized tests are included in the comments inside of square brackets, followed by py.test statuses (pass, fail, xpass, xfail, and skipped) and fail reasons, skip reasons, or error message (as applicable).
  
+## Output
+
+### Without --verbose
+
+    $ py.test . -r T --mt-url=moztrap.allizom.org --mt-username=<username> --mt-apikey=<key> --mt-product=pytest_moztrap --mt-productversion=0.1b --mt-run='plugin tests' --mt-env='Android 2.3'
+
+    =========================================== MozTrap test summary info ===========================================
+    10300 PASSED test_summary_when_single_id_in_marker
+    10302 INVALIDATED test_summary_with_xdist_dash_n
+    10305 PASSED test_summary_when_multiple_ids_in_marker
+    10392 PASSED test_demo_parameterized_with_multiple_outcomes
+    10307 PASSED test_duplicate_ids_in_a_single_test_are_removed_from_summary
+    10321 PASSED test_verbose_report_of_parameterized_with_multiple_outcomes
+    10320 PASSED test_verbose_report_of_failed_test
+    10292 PASSED test_exception_when_environment_not_specified
+    10279 PASSED test_no_exception_if_no_moztrap_flags_specified
+    10296 PASSED test_run_not_found
+    10295 PASSED test_product_version_not_found
+    10294 PASSED test_product_not_found
+    10297 PASSED test_environment_not_found
+    10299 PASSED test_summary_is_not_output_when_no_id_in_marker
+    10298 PASSED test_no_error_if_product_version_and_run_all_specified
+    10393 PASSED test_demo_xpass_trumps_xfail
+    10318 PASSED test_verbose_report_of_xpass_trumps_xfail
+    10319 PASSED test_verbose_report_of_skipped_test
+    10316 PASSED test_verbose_report_of_xfail_test_marker
+    10317 PASSED test_verbose_report_of_xpass_test_marker
+    10314 PASSED test_summary_does_not_include_ids_not_found_on_moztrap
+    10315 PASSED test_verbose_report_of_xfail_inside_test
+    10312 PASSED test_duplicate_ids_across_tests_are_removed_from_summary_and_failure_takes_priority
+    10313 PASSED test_duplicate_ids_across_tests_are_removed_from_summary_and_failure_takes_priority_when_final_outcome_is_passed
+    10311 PASSED test_duplicate_ids_across_tests_are_removed_from_summary
+    10280 PASSED test_exception_if_username_exists_and_apikey_does_not
+    10281 PASSED test_exception_if_apikey_exists_and_username_does_not
+    10282 PASSED test_no_exception_if_both_username_and_apikey_exist
+    10283 PASSED test_exception_if_product_not_specified
+    10285 PASSED test_exception_if_product_version_not_specified
+    10288 PASSED test_exception_if_run_not_specified
+    ==================================== 45 passed, 1 skipped, 4 xfailed, 2 xpassed in 55.17 seconds ====================================
+
+### With --verbose
+
+    $ py.test . -r T --mt-url=moztrap.allizom.org --mt-username=<username> --mt-apikey=<key> --mt-product=pytest_moztrap --mt-productversion=0.1b --mt-run='plugin tests' --mt-env='Android 2.3' --verbose
+
+    =========================================== MozTrap test summary info ===========================================
+    10300 PASSED test_summary_when_single_id_in_marker
+    10302 INVALIDATED test_summary_with_xdist_dash_n
+        SKIPPED: this test requires pytest-xdist
+    10305 PASSED test_summary_when_multiple_ids_in_marker
+    10392 PASSED test_demo_parameterized_with_multiple_outcomes
+        [1] XPASSED
+        [2] XFAILED: demo
+        [3] XFAILED: demo
+        [4] XFAILED: demo
+    10307 PASSED test_duplicate_ids_in_a_single_test_are_removed_from_summary
+    10321 PASSED test_verbose_report_of_parameterized_with_multiple_outcomes
+    10320 PASSED test_verbose_report_of_failed_test
+    10292 PASSED test_exception_when_environment_not_specified
+    10279 PASSED test_no_exception_if_no_moztrap_flags_specified
+    10296 PASSED test_run_not_found
+    10295 PASSED test_product_version_not_found
+    10294 PASSED test_product_not_found
+    10297 PASSED test_environment_not_found
+    10299 PASSED test_summary_is_not_output_when_no_id_in_marker
+    10298 PASSED test_no_error_if_product_version_and_run_all_specified
+    10393 PASSED test_demo_xpass_trumps_xfail
+        [1] XFAILED: demo
+        [2] XPASSED
+    10318 PASSED test_verbose_report_of_xpass_trumps_xfail
+    10319 PASSED test_verbose_report_of_skipped_test
+    10316 PASSED test_verbose_report_of_xfail_test_marker
+    10317 PASSED test_verbose_report_of_xpass_test_marker
+    10314 PASSED test_summary_does_not_include_ids_not_found_on_moztrap
+    10315 PASSED test_verbose_report_of_xfail_inside_test
+    10312 PASSED test_duplicate_ids_across_tests_are_removed_from_summary_and_failure_takes_priority
+    10313 PASSED test_duplicate_ids_across_tests_are_removed_from_summary_and_failure_takes_priority_when_final_outcome_is_passed
+    10311 PASSED test_duplicate_ids_across_tests_are_removed_from_summary
+    10280 PASSED test_exception_if_username_exists_and_apikey_does_not
+    10281 PASSED test_exception_if_apikey_exists_and_username_does_not
+    10282 PASSED test_no_exception_if_both_username_and_apikey_exist
+    10283 PASSED test_exception_if_product_not_specified
+    10285 PASSED test_exception_if_product_version_not_specified
+    10288 PASSED test_exception_if_run_not_specified
+
+    ========================== 45 passed, 1 skipped, 4 xfailed, 2 xpassed in 57.83 seconds ==========================
 
 ## Continuous Integration
 

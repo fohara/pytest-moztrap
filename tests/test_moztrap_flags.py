@@ -7,11 +7,12 @@
 run "python setup.py develop" before running the contained test
 """
 import py
+import pytest
 import os
 
 from mtconnect.connect import ProductVersionDoesNotExistException
 
-
+@pytest.mark.moztrap(10279)
 def test_no_exception_if_no_moztrap_flags_specified(testdir):
     file_test = testdir.makepyfile("""
         import pytest
@@ -22,6 +23,7 @@ def test_no_exception_if_no_moztrap_flags_specified(testdir):
     errmsg = runres.errlines
     assert not errmsg
 
+@pytest.mark.moztrap(10280)
 def test_exception_if_username_exists_and_apikey_does_not(testdir, testmoztrap):
     file_test = testdir.makepyfile("""
         def test_whatever():
@@ -33,6 +35,7 @@ def test_exception_if_username_exists_and_apikey_does_not(testdir, testmoztrap):
     expected = 'ERROR: If either of --mt-username or --mt-apikey are specified, both must be specified.'
     assert expected in errmsg
 
+@pytest.mark.moztrap(10281)
 def test_exception_if_apikey_exists_and_username_does_not(testdir, testmoztrap):
     file_test = testdir.makepyfile("""
         def test_whatever():
@@ -44,6 +47,7 @@ def test_exception_if_apikey_exists_and_username_does_not(testdir, testmoztrap):
     expected = 'ERROR: If either of --mt-username or --mt-apikey are specified, both must be specified.'
     assert expected in errmsg
 
+@pytest.mark.moztrap(10282)
 def test_no_exception_if_both_username_and_apikey_exist(testdir, testmoztrap):
     file_test = testdir.makepyfile("""
         def test_whatever():
@@ -57,6 +61,7 @@ def test_no_exception_if_both_username_and_apikey_exist(testdir, testmoztrap):
     expected = 'ERROR: If either of --mt-username or --mt-apikey are specified, both must be specified.'
     assert not expected in errmsg
 
+@pytest.mark.moztrap(10283)
 def test_exception_if_product_not_specified(testdir, testmoztrap):
     file_test = testdir.makepyfile("""
         def test_whatever():
@@ -73,6 +78,7 @@ def test_exception_if_product_not_specified(testdir, testmoztrap):
     expected = 'The --mt-product was not specified. Possible projects are:'
     assert expected in errmsg[0]
 
+@pytest.mark.moztrap(10285)
 def test_exception_if_product_version_not_specified(testdir, testmoztrap):
     file_test = testdir.makepyfile("""
         def test_whatever():
@@ -89,6 +95,7 @@ def test_exception_if_product_version_not_specified(testdir, testmoztrap):
     expected = 'ERROR: The --mt-productversion was not specified. Possible versions are:'
     assert expected in errmsg[0]
 
+@pytest.mark.moztrap(10288)
 def test_exception_if_run_not_specified(testdir, testmoztrap):
     file_test = testdir.makepyfile("""
         def test_whatever():
@@ -105,6 +112,7 @@ def test_exception_if_run_not_specified(testdir, testmoztrap):
     expected = 'ERROR: The --mt-run was not specified. Possible (active) runs are:'
     assert expected in errmsg[0]
 
+@pytest.mark.moztrap(10292)
 def test_exception_when_environment_not_specified(testdir, testmoztrap):
     file_test = testdir.makepyfile("""
         def test_whatever():
@@ -128,6 +136,7 @@ def test_exception_when_environment_not_specified(testdir, testmoztrap):
             found = True
     assert True, "'Android 2.2' not found in %s" % errmsg
 
+@pytest.mark.moztrap(10294)
 def test_product_not_found(testdir, testmoztrap):
     file_test = testdir.makepyfile("""
         def test_whatever():
@@ -150,6 +159,7 @@ def test_product_not_found(testdir, testmoztrap):
             found = True
     assert True, "'pytest_moztrap' not found in %s" % errmsg
 
+@pytest.mark.moztrap(10295)
 def test_product_version_not_found(testdir, testmoztrap):
     file_test = testdir.makepyfile("""
         def test_whatever():
@@ -172,6 +182,7 @@ def test_product_version_not_found(testdir, testmoztrap):
             found = True
     assert True, "'0.1a' not found in %s" % errmsg
 
+@pytest.mark.moztrap(10296)
 def test_run_not_found(testdir, testmoztrap):
     file_test = testdir.makepyfile("""
         def test_whatever():
@@ -194,6 +205,7 @@ def test_run_not_found(testdir, testmoztrap):
             found = True
     assert True, "'unique name' not found in %s" % errmsg
 
+@pytest.mark.moztrap(10297)
 def test_environment_not_found(testdir, testmoztrap):
     file_test = testdir.makepyfile("""
         def test_whatever():
@@ -217,6 +229,7 @@ def test_environment_not_found(testdir, testmoztrap):
             found = True
     assert True, "'Android 2.2' not found in %s" % errmsg
 
+@pytest.mark.moztrap(10298)
 def test_no_error_if_product_version_and_run_all_specified(testdir, testmoztrap):
     file_test = testdir.makepyfile("""
         def test_whatever():

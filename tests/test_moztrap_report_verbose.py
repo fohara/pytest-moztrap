@@ -5,10 +5,11 @@ import py
 import pytest
 
 
+@pytest.mark.moztrap(10315)
 def test_verbose_report_of_xfail_inside_test(testdir, testmoztrap):
     testdir.makepyfile("""
         import pytest
-        @pytest.mark.moztrap([738])
+        @pytest.mark.moztrap([343])
         def test_whatever():
             pytest.xfail(reason="it is a bad idea")
             assert False
@@ -26,13 +27,14 @@ def test_verbose_report_of_xfail_inside_test(testdir, testmoztrap):
     )
     assert result.ret == 0
     result.stdout.fnmatch_lines(['*MozTrap*',
-                                 '738/* INVALIDATED*',
+                                 '343* INVALIDATED*',
                                  '    XFAILED: it is a bad idea'])
 
+@pytest.mark.moztrap(10316)
 def test_verbose_report_of_xfail_test_marker(testdir, testmoztrap):
     testdir.makepyfile("""
         import pytest
-        @pytest.mark.moztrap([739])
+        @pytest.mark.moztrap([344])
         @pytest.mark.xfail(reason="because we care")
         def test_whatever():
             assert False
@@ -50,13 +52,14 @@ def test_verbose_report_of_xfail_test_marker(testdir, testmoztrap):
     )
     assert result.ret == 0
     result.stdout.fnmatch_lines(['*MozTrap*',
-                                 '739/* INVALIDATED*',
+                                 '344* INVALIDATED*',
                                  '    XFAILED: because we care'])
 
+@pytest.mark.moztrap(10317)
 def test_verbose_report_of_xpass_test_marker(testdir, testmoztrap):
     testdir.makepyfile("""
         import pytest
-        @pytest.mark.moztrap([744])
+        @pytest.mark.moztrap([349])
         @pytest.mark.xfail(reason="because we care")
         def test_whatever():
             pass
@@ -74,13 +77,14 @@ def test_verbose_report_of_xpass_test_marker(testdir, testmoztrap):
     )
     assert result.ret == 0
     result.stdout.fnmatch_lines(['*MozTrap*',
-                                 '744/* PASSED*',
+                                 '349* PASSED*',
                                  '    XPASSED'])
 
+@pytest.mark.moztrap(10318)
 def test_verbose_report_of_xpass_trumps_xfail(testdir, testmoztrap):
     testdir.makepyfile("""
         import pytest
-        @pytest.mark.moztrap([745])
+        @pytest.mark.moztrap([350])
         @pytest.mark.xfail(reason="because we care")
         @pytest.mark.parametrize('param', [1, 2])
         def test_whatever(param):
@@ -102,7 +106,7 @@ def test_verbose_report_of_xpass_trumps_xfail(testdir, testmoztrap):
     )
     assert result.ret == 0
     result.stdout.fnmatch_lines(['*MozTrap*',
-                                 '745/* PASSED*',
+                                 '350* PASSED*',
                                  '    [1] XFAILED: because we care',
                                  '    [2] XPASSED'])
 
@@ -112,10 +116,11 @@ def test_verbose_report_of_xpass_trumps_xfail(testdir, testmoztrap):
 # and therefor will not register a result with
 # moztrap
 
+@pytest.mark.moztrap(10319)
 def test_verbose_report_of_skipped_test(testdir, testmoztrap):
     testdir.makepyfile("""
         import pytest
-        @pytest.mark.moztrap([740])
+        @pytest.mark.moztrap([345])
         def test_whatever():
             pytest.skip("it is the wrong thing")
             assert False
@@ -133,13 +138,14 @@ def test_verbose_report_of_skipped_test(testdir, testmoztrap):
     )
     assert result.ret == 0
     result.stdout.fnmatch_lines(['*MozTrap*',
-                                 '740/* INVALIDATED*',
+                                 '345* INVALIDATED*',
                                  '    SKIPPED: it is the wrong thing'])
 
+@pytest.mark.moztrap(10320)
 def test_verbose_report_of_failed_test(testdir, testmoztrap):
     testdir.makepyfile("""
         import pytest
-        @pytest.mark.moztrap([741])
+        @pytest.mark.moztrap([346])
         def test_whatever():
             assert False, "explanation"
         """)
@@ -156,13 +162,14 @@ def test_verbose_report_of_failed_test(testdir, testmoztrap):
     )
     assert result.ret == 1
     result.stdout.fnmatch_lines(['*MozTrap*',
-                                 '741/* FAILED*',
+                                 '346* FAILED*',
                                  '*explanation*'])
 
+@pytest.mark.moztrap(10321)
 def test_verbose_report_of_parameterized_with_multiple_outcomes(testdir, testmoztrap):
     testdir.makepyfile("""
         import pytest
-        @pytest.mark.moztrap([742])
+        @pytest.mark.moztrap([347])
         @pytest.mark.parametrize('parameter', [1, 2, 3, 4])
         def test_whatever(parameter):
             if parameter == 1:
@@ -188,9 +195,9 @@ def test_verbose_report_of_parameterized_with_multiple_outcomes(testdir, testmoz
     )
     assert result.ret == 1
     result.stdout.fnmatch_lines(['*MozTrap*',
-                                 '742/* FAILED*',
+                                 '347* FAILED*',
                                  '    [1] PASSED',
                                  '    [2] FAILED: E           AssertionError: explanation',
                                  '    [3] SKIPPED: we do not like threes',
                                  '    [4] XFAILED: four is a four letter word'])
-    assert str(result.outlines).count('742/') == 1
+    assert str(result.outlines).count('347') == 2

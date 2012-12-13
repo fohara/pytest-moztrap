@@ -96,7 +96,7 @@ def pytest_sessionstart(session):
             config.option.moztrap_username,
             config.option.moztrap_apikey)
             # config.option.moztrap_apikey,
-            # DEBUG=True)
+            # DEBUG=True) # having debug on will mess up some of the tests
         config.moztrap_connect_session = mtsession
 
         # check for moztrap_products, moztrap_version, and moztrap_run
@@ -179,11 +179,10 @@ def pytest_sessionstart(session):
                 "\n".join(env_names))
         config.moztrap_env_id = environments[0]['id']
 
-        # lookup tables
+        # lookup table
         run_cases = mtsession.get_run_cases(config.moztrap_run_id, config.moztrap_env_id)
         for c in run_cases:
-            config.moztrap_test_cases_by_test_case_id[c['caseversion']['id']] = c
-            config.moztrap_test_cases_by_run_case_id[c['caseversion']['case']['id']] = c
+            config.moztrap_test_cases_by_test_case_id[c['caseversion']['case']['id']] = c
 
 
 def pytest_terminal_summary(terminalreporter):
@@ -228,10 +227,9 @@ def process_report(config, report):
         run_results = config.moztrap_run_results
         for case_id in report.moztrap_test_case_ids:
             if case_id in config.moztrap_test_cases_by_test_case_id.keys():
-                run_case_id = config.moztrap_test_cases_by_test_case_id[case_id]['caseversion']['case']['id']
                 status = getattr(report, 'moztrap_status')
                 comment = getattr(report, 'moztrap_comment', "")
-                run_results.update(run_case_id, config.moztrap_env_id, status, comment)
+                run_results.update(case_id, config.moztrap_env_id, status, comment)
 
 def show_moztrap(terminalreporter, lines):
     config = terminalreporter.config
@@ -239,16 +237,17 @@ def show_moztrap(terminalreporter, lines):
     verbose = config.option.verbose
 
     for (key, result) in run_results._results.items():
-        run_case_id = result['case']
-        test_case_id = config.moztrap_test_cases_by_run_case_id[run_case_id]['caseversion']['id']
-        name = config.moztrap_test_cases_by_run_case_id[run_case_id]['caseversion']['name']
+        case_id = result['case']
+        name = config.moztrap_test_cases_by_test_case_id[case_id]['caseversion']['name']
         status = result['status'].upper()
-        lines.append("%s/%s %s %s" % (test_case_id, run_case_id, status, name))
+        lines.append("%s %s %s" % (case_id, status, name))
         if verbose > 0:
             comments = result['comment'].split("\n")
-            comments.sort()
-            # indent the comments
-            lines.append("    %s" % "\n    ".join(comments))
+            # don't print out lines that just say "\nPASSED"
+            if not (len(comments) == 1 and comments[0] == 'PASSED'):
+                comments.sort()
+                # indent the comments
+                lines.append("    %s" % "\n    ".join(comments))
 
 
 def report_to_the_mothership(config):
@@ -256,8 +255,8 @@ def report_to_the_mothership(config):
     if len(config.moztrap_run_results.results):
         mtsession = config.moztrap_connect_session 
         res = mtsession.submit_results(config.moztrap_run_id, config.moztrap_run_results)
-        res.raise_for_status()
         # print "SUBMIT RESULT: " + str(res.text)
+        res.raise_for_status()
 
 
 def pytest_runtest_makereport(__multicall__, item, call):
@@ -298,10 +297,13 @@ def pytest_runtest_makereport(__multicall__, item, call):
                 else:
                     print "UNEXPECTED XFAIL SITUATION"
             # in-test xfail reason
+            # this works for pytest 2.2.3 but not 2.3.4
             elif hasattr(report, 'keywords') and 'xfail' in report.keywords.keys():
                 _reason = report.keywords.get('xfail', "")
                 _reason = "XFAILED: " + _reason.replace('reason: ', "")
                 _status = 'invalidated'
+            # this works for pytest 2.2.3 but not 2.3.4
+            # in-test xfail falls thru to here in 2.3.4
             elif report.skipped:  # skipped reason
                 _reason = str(report.longrepr[2])
                 _reason = _reason.replace('Skipped: ', "SKIPPED: ")
