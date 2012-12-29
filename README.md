@@ -164,3 +164,4 @@ The following flags have defaults that can be overwridden:
     --test-mt-env             (Android 2.2)
 
 The test_moztrap_report.py and test_moztrap_report_verbose.py files report selected results to moztrap.allizom.org, but the success of this action is not verified within the automation. After running this suite, https://moztrap.allizom.org/results/cases/?filter-run=47 (or adjusted for your current version and run) should show results for all of the test cases, with 3 invalidated, 4 failed, and 8 passing results.
+
