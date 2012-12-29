@@ -296,15 +296,18 @@ def pytest_runtest_makereport(__multicall__, item, call):
                     _status = 'passed'
                 else:
                     print "UNEXPECTED XFAIL SITUATION"
-            # in-test xfail reason
-            # this works for pytest 2.2.3 but not 2.3.4
+            # in-test xfail reason prior to py.test 2.3
             elif hasattr(report, 'keywords') and 'xfail' in report.keywords.keys():
                 _reason = report.keywords.get('xfail', "")
                 _reason = "XFAILED: " + _reason.replace('reason: ', "")
                 _status = 'invalidated'
-            # this works for pytest 2.2.3 but not 2.3.4
-            # in-test xfail falls thru to here in 2.3.4
-            elif report.skipped:  # skipped reason
+            # in-test xfail reason from py.test 2.3 onward
+            elif hasattr(report, "wasxfail"):
+                _reason = report.wasxfail
+                _reason = "XFAILED: " + _reason.replace('reason: ', "")
+                _status = 'invalidated'
+            # skipped, with reason             
+            elif report.skipped:
                 _reason = str(report.longrepr[2])
                 _reason = _reason.replace('Skipped: ', "SKIPPED: ")
                 _status = 'invalidated'
