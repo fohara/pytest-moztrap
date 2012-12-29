@@ -24,6 +24,7 @@ env:
 
 install: 
   - pip install --use-mirrors $CONFIG
+  - pip install git+https://github.com/klrmn/moztrap-connect/
   - "python setup.py install"
 
 # command to run tests
