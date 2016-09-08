@@ -31,7 +31,7 @@ class ConnectResults(object):
             raise InvalidStatusException, "%s is not a valid status" % new_status
 
         self.environments.append(environment_id)
-        key = environment_id + "_" + case_id
+        key = "{}_{}".format(environment_id, case_id)
         if self._results.has_key(key):
             if comment:
                 self.update_comment(key, comment)

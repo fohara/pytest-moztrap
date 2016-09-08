@@ -91,7 +91,7 @@ def pytest_sessionstart(session):
 
         # and a session should be opened
         mtsession = Connect(
-            'https',
+            'http',
             config.option.moztrap_url,
             config.option.moztrap_username,
             config.option.moztrap_apikey)
@@ -181,8 +181,9 @@ def pytest_sessionstart(session):
 
         # lookup table
         run_cases = mtsession.get_run_cases(config.moztrap_run_id, config.moztrap_env_id)
-        for c in run_cases:
-            config.moztrap_test_cases_by_test_case_id[c['caseversion']['case']['id']] = c
+        for case in run_cases:
+            case_id = case['caseversion']['case'].split('/')[-2]
+            config.moztrap_test_cases_by_test_case_id[case_id] = case
 
 
 def pytest_terminal_summary(terminalreporter):
