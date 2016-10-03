@@ -262,8 +262,7 @@ def report_to_the_mothership(config):
 
 def pytest_runtest_makereport(__multicall__, item, call):
     report = __multicall__.execute()
-
-    if report.when == 'call':
+    if report.when == 'call' or report.skipped:
         if hasattr(item.obj, 'moztrap'):
             # moztrap case ids
             _marker = getattr(item.obj, 'moztrap')
