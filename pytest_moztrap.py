@@ -260,8 +260,10 @@ def report_to_the_mothership(config):
         res.raise_for_status()
 
 
-def pytest_runtest_makereport(__multicall__, item, call):
-    report = __multicall__.execute()
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    report = outcome.get_result()
     if report.when == 'call' or report.skipped:
         if hasattr(item.obj, 'moztrap'):
             # moztrap case ids
@@ -328,8 +330,6 @@ def pytest_runtest_makereport(__multicall__, item, call):
             object.__setattr__(report, 'moztrap_comment', " ".join([_params, _reason]).strip())
             # assert _status
             object.__setattr__(report, 'moztrap_status', _status)
-
-    return report
 
 
 def pretty_print(dictionary):
